@@ -52,7 +52,11 @@ def txt_to_xml(src_annotation, src_img, dest_annotation, dest_img, class_name, i
         # new_width = int(ratio * width)
         # resize the image
         # image = cv2.resize(image, (new_width, new_height))
+
+        '''
         image = cv2.resize(image, (desired_size, desired_size))
+        '''
+
         # compute the change in size of the smallest side
         # delta_width = desired_size - new_width
         # delta_height = desired_size - new_height
@@ -68,8 +72,14 @@ def txt_to_xml(src_annotation, src_img, dest_annotation, dest_img, class_name, i
         xml_parser.SubElement(annotation, 'filename').text = image_name
         # store the image sizes
         size = xml_parser.SubElement(annotation, 'size')
+        '''
         xml_parser.SubElement(size, 'width').text = str(desired_size)
         xml_parser.SubElement(size, 'height').text = str(desired_size)
+        '''
+
+        xml_parser.SubElement(size, 'width').text = str(width)
+        xml_parser.SubElement(size, 'height').text = str(height)
+
         with open(path, 'r') as annotation_file:
             is_object_found = False
             # loop through each line
@@ -92,15 +102,27 @@ def txt_to_xml(src_annotation, src_img, dest_annotation, dest_img, class_name, i
                 # xml_parser.SubElement(bnd_box, 'xmax').text = str(int(float(content[x + 2]) * ratio + delta_width // 2))
                 # xml_parser.SubElement(bnd_box, 'ymax').text = str(int(float(content[x + 3]) * ratio + delta_height // 2))
                 # check the sensitivity parameter, to control the size of the objects with respect to the image size
+
+                '''
                 object_ratio = (float(content[x + 2]) - float(content[x])) * (float(content[x + 3]) - float(content[x + 1])) / (height * width)
                 if object_ratio < sensitivity:
                     # the object is too small for our model
                     continue
+                '''
+
                 is_object_found = True
+                '''
                 xml_parser.SubElement(bnd_box, 'xmin').text = str(int(float(content[x]) * width_ratio))
                 xml_parser.SubElement(bnd_box, 'ymin').text = str(int(float(content[x + 1]) * height_ratio))
                 xml_parser.SubElement(bnd_box, 'xmax').text = str(int(float(content[x + 2]) * width_ratio))
                 xml_parser.SubElement(bnd_box, 'ymax').text = str(int(float(content[x + 3]) * height_ratio))
+                '''
+
+                xml_parser.SubElement(bnd_box, 'xmin').text = str(int(float(content[x])))
+                xml_parser.SubElement(bnd_box, 'ymin').text = str(int(float(content[x + 1])))
+                xml_parser.SubElement(bnd_box, 'xmax').text = str(int(float(content[x + 2])))
+                xml_parser.SubElement(bnd_box, 'ymax').text = str(int(float(content[x + 3])))
+
             # check if the xml file is valid
             if is_object_found:
                 # save the xml file
@@ -134,7 +156,7 @@ def main():
     # use direct code for conversion
     if args.use_code:
         print('Parsing From Direct Code, This will take some time!!!!\n\n\n')
-        root_dir = '/home/suson/AI/datasets/custom_bpns_224_dataset/'
+        root_dir = '/home/suson/AI/datasets/custom_bpns_no_resize/'
         dest_annotation = join(root_dir, 'train', 'annotations')
         dest_img = join(root_dir, 'train', 'images')
         max_limit_train = 2500

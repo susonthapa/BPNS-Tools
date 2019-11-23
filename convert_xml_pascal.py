@@ -26,10 +26,14 @@ def txt_to_xml(src_annotation, src_img, dest_annotation, dest_img):
         image = cv2.imread(src_image)
         height, width = image.shape[0:2]
 
+
+        '''
         height_ratio = float(desired_size) / height
         width_ratio = float(desired_size) / width
         image = cv2.resize(image, (desired_size, desired_size))
 
+
+        '''
         # parse the existing file
         old_xml = xml_parser.parse(path)
         is_object_found = False
@@ -43,20 +47,40 @@ def txt_to_xml(src_annotation, src_img, dest_annotation, dest_img):
         xml_parser.SubElement(annotation, 'filename').text = image_name
         # store the image sizes
         size = xml_parser.SubElement(annotation, 'size')
+
+        '''
         xml_parser.SubElement(size, 'width').text = str(desired_size)
         xml_parser.SubElement(size, 'height').text = str(desired_size)
+        '''
+
+        xml_parser.SubElement(size, 'width').text = str(width)
+        xml_parser.SubElement(size, 'height').text = str(height)
+
         for object in old_objects:
             # store the information of the objects within the image
             box = object.find('bndbox')
+
+            '''
             xmin = int(float(box.find('xmin').text) * width_ratio)
             ymin = int(float(box.find('ymin').text) * height_ratio)
             xmax = int(float(box.find('xmax').text) * width_ratio)
             ymax = int(float(box.find('ymax').text) * height_ratio)
+            '''
+
+
+            xmin = int(float(box.find('xmin').text))
+            ymin = int(float(box.find('ymin').text))
+            xmax = int(float(box.find('xmax').text))
+            ymax = int(float(box.find('ymax').text))
+
+            '''
             # check if the object is too small
             if (xmax - xmin) * (ymax - ymin) < 1024:
                 print('Annotation Too Small, Skipping!')
                 continue
 
+            '''
+            
             objects = xml_parser.SubElement(annotation, 'object')
             xml_parser.SubElement(objects, 'name').text = object.find('name').text
             bnd_box = xml_parser.SubElement(objects, 'bndbox')
@@ -79,8 +103,8 @@ def txt_to_xml(src_annotation, src_img, dest_annotation, dest_img):
             index += 1
 
 def main():
-    txt_to_xml('/home/suson/AI/datasets/coco_train/train/annotations/', '/home/suson/AI/datasets/coco_train/train/images/', '/home/suson/AI/datasets/custom_coco_224_sensitive_dataset/train/annotations/', '/home/suson/AI/datasets/custom_coco_224_sensitive_dataset/train/images/')
-    txt_to_xml('/home/suson/AI/datasets/coco_train/validation/annotations/', '/home/suson/AI/datasets/coco_train/validation/images/', '/home/suson/AI/datasets/custom_coco_224_sensitive_dataset/validation/annotations/', '/home/suson/AI/datasets/custom_coco_224_sensitive_dataset/validation/images/')
+    txt_to_xml('/home/suson/AI/datasets/coco_train/train/annotations/', '/home/suson/AI/datasets/coco_train/train/images/', '/home/suson/AI/datasets/custom_coco_no_resize/train/annotations/', '/home/suson/AI/datasets/custom_coco_no_resize/train/images/')
+    txt_to_xml('/home/suson/AI/datasets/coco_train/validation/annotations/', '/home/suson/AI/datasets/coco_train/validation/images/', '/home/suson/AI/datasets/custom_coco_no_resize/validation/annotations/', '/home/suson/AI/datasets/custom_coco_no_resize/validation/images/')
 
 
 if __name__ == '__main__':
