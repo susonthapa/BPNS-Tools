@@ -6,7 +6,7 @@ import cv2
 import re
 from os.path import join, splitext
 
-desired_size = 224
+desired_size = 300
 
 
 def convert():
@@ -42,6 +42,10 @@ def txt_to_xml(src_annotation, src_img, dest_annotation, dest_img, class_name, i
         image = cv2.imread(src_image)
         height, width = image.shape[0:2]
 
+        min_size = min(height, width)
+
+        scale_ratio = float(desired_size) / min_size
+
         height_ratio = float(desired_size) / height
         width_ratio = float(desired_size) / width
 
@@ -53,9 +57,11 @@ def txt_to_xml(src_annotation, src_img, dest_annotation, dest_img, class_name, i
         # resize the image
         # image = cv2.resize(image, (new_width, new_height))
 
-        '''
-        image = cv2.resize(image, (desired_size, desired_size))
-        '''
+        width = int(width * scale_ratio)
+        height = int(height * scale_ratio)
+        
+        image = cv2.resize(image, (width, height))
+        
 
         # compute the change in size of the smallest side
         # delta_width = desired_size - new_width
@@ -111,11 +117,12 @@ def txt_to_xml(src_annotation, src_img, dest_annotation, dest_img, class_name, i
                 '''
 
                 is_object_found = True
-                '''
-                xml_parser.SubElement(bnd_box, 'xmin').text = str(int(float(content[x]) * width_ratio))
-                xml_parser.SubElement(bnd_box, 'ymin').text = str(int(float(content[x + 1]) * height_ratio))
-                xml_parser.SubElement(bnd_box, 'xmax').text = str(int(float(content[x + 2]) * width_ratio))
-                xml_parser.SubElement(bnd_box, 'ymax').text = str(int(float(content[x + 3]) * height_ratio))
+                
+                xml_parser.SubElement(bnd_box, 'xmin').text = str(int(float(content[x]) * scale_ratio))
+                xml_parser.SubElement(bnd_box, 'ymin').text = str(int(float(content[x + 1]) * scale_ratio))
+                xml_parser.SubElement(bnd_box, 'xmax').text = str(int(float(content[x + 2]) * scale_ratio))
+                xml_parser.SubElement(bnd_box, 'ymax').text = str(int(float(content[x + 3]) * scale_ratio))
+                
                 '''
 
                 xml_parser.SubElement(bnd_box, 'xmin').text = str(int(float(content[x])))
@@ -123,6 +130,7 @@ def txt_to_xml(src_annotation, src_img, dest_annotation, dest_img, class_name, i
                 xml_parser.SubElement(bnd_box, 'xmax').text = str(int(float(content[x + 2])))
                 xml_parser.SubElement(bnd_box, 'ymax').text = str(int(float(content[x + 3])))
 
+                '''
             # check if the xml file is valid
             if is_object_found:
                 # save the xml file
@@ -156,7 +164,7 @@ def main():
     # use direct code for conversion
     if args.use_code:
         print('Parsing From Direct Code, This will take some time!!!!\n\n\n')
-        root_dir = '/home/suson/AI/datasets/custom_bpns_no_resize/'
+        root_dir = '/home/suson/AI/datasets/custom_bpns_aspect_ratio/'
         dest_annotation = join(root_dir, 'train', 'annotations')
         dest_img = join(root_dir, 'train', 'images')
         max_limit_train = 2500

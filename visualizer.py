@@ -5,7 +5,7 @@ import xml.etree.ElementTree as parser
 import colorsys
 
 root = '/home/suson/AI/datasets/'
-dataset_name = 'custom_coco_224_sensitive_dataset'
+dataset_name = 'coco_train'
 
 
 def random_colors(n, bright=True):

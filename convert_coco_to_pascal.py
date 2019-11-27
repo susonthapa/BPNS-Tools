@@ -105,10 +105,10 @@ class CoCoConverter(object):
 
 
 def main():
-    json_file = '/home/suson/AI/cocoapi/PythonAPI/coco_annotations/annotations/instances_val2017.json'
+    json_file = '/home/suson/AI/cocoapi/PythonAPI/coco_annotations/annotations/instances_train2017.json'
     classes = ['person', 'bus', 'car', 'bicycle', 'motorcycle', 'truck']
-    dataset_path = '/home/suson/AI/datasets/coco_train/validation/'
-    convertor = CoCoConverter(json_file, dataset_path, classes, 5000)
+    dataset_path = '/home/suson/AI/datasets/coco_train/train/'
+    convertor = CoCoConverter(json_file, dataset_path, classes, 25000)
 
 
 
